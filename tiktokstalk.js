@@ -4,7 +4,7 @@ const axios = require('axios')
 async function tiktokstalk(username){
     try{
         if(!username) throw Error('username required')
-        html = await axios.get(
+        const html = await axios.get(
             'https://www.tiktok.com/@' + username,
             {
                 headers:{
@@ -13,8 +13,8 @@ async function tiktokstalk(username){
                 }
             }
         ).then(r => r.data)
-        pick = function(re){
-            m = html.match(re)
+        const pick = function(re){
+            const m = html.match(re)
             return m ? m[1] : null
         }
         return {
@@ -32,7 +32,19 @@ async function tiktokstalk(username){
     }
 }
 
-(async () => {
-const y = await tiktokstalk("whyux_d")
-console.log(y)
+async function mainStalk(username){
+    let result
+    for(let i = 1; i <= 10; i++){
+        result = await tiktokstalk(username)
+        if(result?.status !== 'error'){
+            return result
+        }
+        await new Promise(r => setTimeout(r, 2000))
+    }
+    return result
+}
+
+;(async () => {
+    const y = await mainStalk("whyux_d")
+    console.log(y)
 })()
